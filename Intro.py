@@ -4,7 +4,7 @@ st.set_page_config(
     page_title="Intro",
 )
 
-st.write("# DSA Vote Breakdown Dashboard")
+st.write("# Unofficial DSA Vote Breakdown Dashboard")
 
 st.markdown(
     """
