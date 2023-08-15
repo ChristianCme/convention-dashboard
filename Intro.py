@@ -18,3 +18,12 @@ st.markdown(
     - A some sort of clustering algorithm (Kmeans?) and potentially also other heuristics to show how many groups should have been. Maybe a visualization? 
     """
 )
+
+with st.expander("Technical TODOs"):
+    st.markdown(
+        """
+        - Initial data cleaning and formatting, if there's transformations we can do once and save somewhere, that's ideal. Streamlit isn't super performant.
+        - Set up session state to load in data https://docs.streamlit.io/library/api-reference/session-state
+        - Data can be easily loaded in from remote sources. https://docs.streamlit.io/knowledge-base/tutorials/databases
+        """
+        )
