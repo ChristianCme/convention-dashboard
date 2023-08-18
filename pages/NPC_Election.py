@@ -18,6 +18,7 @@ def load_data(sheets_url):
 df = load_data(st.secrets["public_gsheets_url"])
 df = df.dropna(subset=['choice_1'])
 df = df.drop(df[df['choice_1'].str.contains("Vote")].index)
+df = df.reset_index(drop=True)
 
 first_ballot = df.groupby('choice_1').count().reset_index()
 first_ballot = first_ballot.rename(columns={"choice_1":"Candidate", 'Voter':'Votes'})
@@ -37,11 +38,10 @@ num_ranked = df.iloc[:, -41:].isnull().sum(axis=1).apply(lambda x: 41 - x).mean(
 
 
 #VISUAL ELEMENTS
-#st.write(df.shape)
 st.write("# NPC Election 2023")
 st.warning('Ballot weights are not considered yet. The 7 ballots anonymously counted due to techical errors are not represented. Empty ballots are discarded.', icon="⚠️")
 met1, met2 = st.columns(2)
-#met1.metric('Number of Ballots Cast', df.shape[0])
+met1.metric('Number of Ballots Cast', df.shape[0])
 met2.metric('Average Number of Candidates Ranked', round(num_ranked, 2))
 st.write("## Candidates Ranked #1")
 st.bar_chart(first_ballot, x="Candidate", y="Votes")
