@@ -21,16 +21,27 @@ first_ballot = df.groupby('choice_1').count().reset_index()
 first_ballot = first_ballot.rename(columns={"choice_1":"Candidate", 'Voter':'Votes'})
 first_ballot = first_ballot[['Candidate', 'Votes']]
 
+last_ballot = df.groupby('choice_41').count().reset_index()
+last_ballot = last_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Votes'})
+last_ballot = last_ballot[['Candidate', 'Votes']]
+
 #VISUAL ELEMENTS
 
 st.write("# NPC Election 2023")
-
+st.write("## Candidates Ranked #1")
 st.bar_chart(first_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw First Ballot Counts"):
     st.dataframe(first_ballot)
 
+st.write("## Candidates Ranked #41")
+st.bar_chart(last_ballot, x="Candidate", y="Votes")
 
+with st.expander("Raw Last Ballot Counts"):
+    st.dataframe(last_ballot)
+
+
+st.write("## Raw Ballots")
 with st.expander("Raw Data"):
     st.dataframe(df)
 
