@@ -31,7 +31,6 @@ last_ballot = last_ballot.replace('', np.nan).fillna(axis=1, method='ffill')
 last_ballot = last_ballot.groupby('choice_41').count().reset_index()
 last_ballot = last_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Votes'})
 last_ballot = last_ballot[['Candidate', 'Votes']]
-st.write(last_ballot)
 
 #VISUAL ELEMENTS
 
