@@ -16,6 +16,8 @@ def load_data(sheets_url):
     return pd.read_csv(csv_url)
 
 df = load_data(st.secrets["public_gsheets_url"])
+df = df.dropna(subset=['choice_1'])
+df = df.drop(df[df['choice_1'].str.contains("Vote")].index)
 
 first_ballot = df.groupby('choice_1').count().reset_index()
 first_ballot = first_ballot.rename(columns={"choice_1":"Candidate", 'Voter':'Votes'})
@@ -26,16 +28,21 @@ final_ballot = final_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Vo
 final_ballot = final_ballot[['Candidate', 'Votes']]
 
 #Gets candidate ranked last on each ballot
-last_ballot = df.dropna(subset=['choice_1'])
-last_ballot = last_ballot.replace('', np.nan).fillna(axis=1, method='ffill')
+last_ballot = df.replace('', np.nan).fillna(axis=1, method='ffill')
 last_ballot = last_ballot.groupby('choice_41').count().reset_index()
 last_ballot = last_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Votes'})
 last_ballot = last_ballot[['Candidate', 'Votes']]
 
-#VISUAL ELEMENTS
+num_ranked = df.iloc[:, -41:].isnull().sum(axis=1).apply(lambda x: 41 - x).mean()
 
+
+#VISUAL ELEMENTS
+#st.write(df.shape)
 st.write("# NPC Election 2023")
-st.warning('Ballot weights are not considered yet', icon="⚠️")
+st.warning('Ballot weights are not considered yet. The 7 ballots anonymously counted due to techical errors are not represented. Empty ballots are discarded.', icon="⚠️")
+met1, met2 = st.columns(2)
+#met1.metric('Number of Ballots Cast', df.shape[0])
+met2.metric('Average Number of Candidates Ranked', round(num_ranked, 2))
 st.write("## Candidates Ranked #1")
 st.bar_chart(first_ballot, x="Candidate", y="Votes")
 
