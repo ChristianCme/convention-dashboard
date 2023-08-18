@@ -46,13 +46,13 @@ def gen_col_list(x):
     return col_list
 
 def most_pop_x_ordered(x):
-    return weighted_df.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'})
+    return weighted_df.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'}).sort_values(['count'], axis=0, ascending=False)
 
 def most_pop_x_unordered(x):
     unordered_pop_x = weighted_df.copy()
     unordered_pop_x = unordered_pop_x[unordered_pop_x[gen_col_list(x)[-1]].notna()]
     unordered_pop_x[gen_col_list(x)] = np.sort(unordered_pop_x[gen_col_list(x)], axis=1)
-    return unordered_pop_x.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'})
+    return unordered_pop_x.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'}).sort_values(['count'], axis=0, ascending=False)
 
 
 #VISUAL ELEMENTS
@@ -67,21 +67,21 @@ st.write("## Candidates Ranked #1")
 st.bar_chart(first_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw First Ballot Counts"):
-    st.dataframe(first_ballot, hide_index=True)
+    st.dataframe(first_ballot.sort_values(['Votes'], axis=0, ascending=False), hide_index=True)
 
 
 st.write("## Candidates Ranked Last")
 st.bar_chart(last_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw Last Ballot Counts"):
-    st.dataframe(last_ballot, hide_index=True)
+    st.dataframe(last_ballot.sort_values(['Votes'], axis=0, ascending=False), hide_index=True)
 
 st.write("## Candidates Ranked #41")
 st.write("Only ballots that ranked all candidates are counted for this chart")
 st.bar_chart(final_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw Ranked #41 Ballot Counts"):
-    st.dataframe(final_ballot)
+    st.dataframe(final_ballot.sort_values(['Votes'], axis=0, ascending=False))
 
 
 st.write("## Most Popular Combos")
