@@ -1,3 +1,4 @@
+import altair as alt
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -87,14 +88,32 @@ with st.expander("Raw Ranked #41 Ballot Counts"):
 st.write("## Most Popular Combos")
 control1, control2, control3 = st.columns(3)
 groupsize = control1.slider("Combo Size", 1, 41, 3)
-cutoff = control2.number_input("Cutoff", 40)
+cutoff = control2.number_input("Cutoff", 1, 1000, 40)
 ordered = control3.checkbox("Ordered?")
+
 if ordered:
     st.write("Most Popular Combo Ordered")
-    st.dataframe(most_pop_x_ordered(groupsize), hide_index=True)
+    data = most_pop_x_ordered(groupsize)
+    order_text = " Ordered"
 else:
     st.write("Most Popular Combo Unordered")
-    st.dataframe(most_pop_x_unordered(groupsize), hide_index=True)
+    data = most_pop_x_unordered(groupsize)
+    order_text = " Unordered"
+
+chart_data = data.copy()
+chart_data['combo'] = chart_data.iloc[:, :-1].astype(str).agg('|'.join,axis=1)
+chart_data = chart_data[chart_data['count'] > cutoff]
+
+
+c = alt.Chart(chart_data).encode(
+    y=alt.Y('combo').title(None),
+    #y='Top X' + order_text,
+    x=alt.X('count').axis(None),
+    text='count'
+)
+st.altair_chart((c.mark_bar() + c.mark_text(align='left', dx=5, color='white')).configure_axis(labelLimit=1000), use_container_width=True)
+st.dataframe(data, hide_index=True)
+
 
 
 st.write("## Raw Ballots")
