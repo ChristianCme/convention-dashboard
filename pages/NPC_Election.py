@@ -22,21 +22,21 @@ df = df.reset_index(drop=True)
 
 weighted_df = df.loc[df.index.repeat(df['Weight'])]
 
-first_ballot = df.groupby('choice_1').count().reset_index()
+first_ballot = weighted_df.groupby('choice_1').count().reset_index()
 first_ballot = first_ballot.rename(columns={"choice_1":"Candidate", 'Voter':'Votes'})
 first_ballot = first_ballot[['Candidate', 'Votes']]
 
-final_ballot = df.groupby('choice_41').count().reset_index()
+final_ballot = weighted_df.groupby('choice_41').count().reset_index()
 final_ballot = final_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Votes'})
 final_ballot = final_ballot[['Candidate', 'Votes']]
 
 #Gets candidate ranked last on each ballot
-last_ballot = df.replace('', np.nan).fillna(axis=1, method='ffill')
+last_ballot = weighted_df.replace('', np.nan).fillna(axis=1, method='ffill')
 last_ballot = last_ballot.groupby('choice_41').count().reset_index()
 last_ballot = last_ballot.rename(columns={"choice_41":"Candidate", 'Voter':'Votes'})
 last_ballot = last_ballot[['Candidate', 'Votes']]
 
-num_ranked = df.iloc[:, -41:].isnull().sum(axis=1).apply(lambda x: 41 - x).mean()
+num_ranked = weighted_df.iloc[:, -41:].isnull().sum(axis=1).apply(lambda x: 41 - x).mean()
 
 
 #VISUAL ELEMENTS
