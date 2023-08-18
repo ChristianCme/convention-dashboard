@@ -39,6 +39,22 @@ last_ballot = last_ballot[['Candidate', 'Votes']]
 num_ranked = weighted_df.iloc[:, -41:].isnull().sum(axis=1).apply(lambda x: 41 - x).mean()
 
 
+def gen_col_list(x):
+    col_list = []
+    for num in range(x):
+        col_list.append('choice_' + str(num + 1))
+    return col_list
+
+def most_pop_x_ordered(x):
+    return weighted_df.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'})
+
+def most_pop_x_unordered(x):
+    unordered_pop_x = weighted_df.copy()
+    unordered_pop_x = unordered_pop_x[unordered_pop_x[gen_col_list(x)[-1]].notna()]
+    unordered_pop_x[gen_col_list(x)] = np.sort(unordered_pop_x[gen_col_list(x)], axis=1)
+    return unordered_pop_x.groupby(gen_col_list(x)).size().reset_index().rename(columns={0:'count'})
+
+
 #VISUAL ELEMENTS
 st.write("# NPC Election 2023")
 st.warning('The 7 ballots anonymously counted due to techical errors are not represented. Empty ballots are discarded.', icon="⚠️")
@@ -51,14 +67,14 @@ st.write("## Candidates Ranked #1")
 st.bar_chart(first_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw First Ballot Counts"):
-    st.dataframe(first_ballot)
+    st.dataframe(first_ballot, hide_index=True)
 
 
 st.write("## Candidates Ranked Last")
 st.bar_chart(last_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw Last Ballot Counts"):
-    st.dataframe(last_ballot)
+    st.dataframe(last_ballot, hide_index=True)
 
 st.write("## Candidates Ranked #41")
 st.write("Only ballots that ranked all candidates are counted for this chart")
@@ -66,6 +82,19 @@ st.bar_chart(final_ballot, x="Candidate", y="Votes")
 
 with st.expander("Raw Ranked #41 Ballot Counts"):
     st.dataframe(final_ballot)
+
+
+st.write("## Most Popular Combos")
+control1, control2, control3 = st.columns(3)
+groupsize = control1.slider("Combo Size", 1, 41, 3)
+cutoff = control2.number_input("Cutoff", 40)
+ordered = control3.checkbox("Ordered?")
+if ordered:
+    st.write("Most Popular Combo Ordered")
+    st.dataframe(most_pop_x_ordered(groupsize), hide_index=True)
+else:
+    st.write("Most Popular Combo Unordered")
+    st.dataframe(most_pop_x_unordered(groupsize), hide_index=True)
 
 
 st.write("## Raw Ballots")
